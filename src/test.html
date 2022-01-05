@@ -11,13 +11,29 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-    const socket = io();
-    socket.emit("list", {});
-    socket.on("ping", console.log)
-    // {request-type: } => {
-	// 	response-type: "list",
-	// 	symbols: ['ABC', 'XYZ', 'LMNO']
-	// }
+        const socket = io();
+        //requirement #1
+        socket.emit("list", {'request-type': "list"});
+
+        socket.on("list", console.log)
+
+        //req #2
+        socket.emit("historical", {
+            'request-type': "historical",
+            symbols: ['FACE', 'APgPL'],
+            start: '2021-12-01 02:02:03',
+	    });
+
+        socket.on("historical", console.log)
+
+        //req #3
+        socket.emit("live", {
+            'request-type': "live",
+            symbols: ['FACE', 'APPL', 'gfcrdcdc']
+	    });
+
+        socket.on("live", console.log)
+        
     </script>
 </body>
 </html>

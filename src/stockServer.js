@@ -4,30 +4,80 @@ exports.StockServer = void 0;
 var express = require("express");
 var cors = require("cors");
 var http = require("http");
-// import Chat from '../../socket-chat/src/app/Classes/Chat'
-// import Message from '../../socket-chat/src/app/Classes/Message'
 var StockServer = /** @class */ (function () {
-    /* Map of Chat instances to their respective lobby names */
-    // private chatRooms: Map<string, Chat> = new Map<string, Chat>() // All Game instances stored in a map
     function StockServer() {
         this.createApp();
-        this.config();
-        this.createServer();
-        this.sockets();
         this.listen();
+        this.createDummyData();
     }
+    StockServer.prototype.createDummyData = function () {
+        StockServer.SYMBOLS.forEach(function (sym) {
+            StockServer.dummyData[sym] = [];
+            var time = Date.now(), max = 100, min = 10;
+            var prevOpen = '', bool = true;
+            var open = '';
+            for (var i = 0; i < 100; i++) {
+                open = (Math.random() * (max - min) + min).toFixed(2);
+                StockServer.dummyData[sym].push({
+                    timestamp: new Date(time - i * 86400000).toDateString(),
+                    open: open,
+                    high: (Math.random() * (max * 2 - max) + max).toFixed(2),
+                    low: (Math.random() * (min - 1) + 1).toFixed(2),
+                    close: bool ? (Math.random() * (max - min) + min).toFixed(2) : prevOpen
+                });
+                bool = false;
+                prevOpen = open;
+            }
+        });
+    };
     StockServer.prototype.createApp = function () {
         this.app = express();
         this.app.use(cors());
-    };
-    StockServer.prototype.createServer = function () {
         this.server = http.createServer(this.app);
-    };
-    StockServer.prototype.config = function () {
         this.port = process.env.PORT || StockServer.PORT;
-    };
-    StockServer.prototype.sockets = function () {
         this.io = require('socket.io')(this.server, { cors: { origins: '*' } });
+    };
+    StockServer.prototype.getHistoricalData = function (obj) {
+        var output = {
+            "response-type": "historical",
+            data: []
+        };
+        obj.symbols.forEach(function (element) {
+            if (!StockServer.dummyData[element]) {
+                output.data.push({
+                    symbol: element,
+                    data: []
+                });
+            }
+            else {
+                output.data.push({
+                    symbol: element,
+                    data: StockServer.dummyData[element].filter(function (dp) { return new Date(dp.timestamp) >= new Date(obj.start); })
+                });
+            }
+        });
+        return output;
+    };
+    StockServer.prototype.getLiveData = function (sym) {
+        var max = 100, min = 10;
+        var output = {
+            "response-type": "live",
+            "new-value": { symbol: sym, data: [] }
+        };
+        if (!StockServer.dummyData[sym]) {
+            //output['new-value'].data.push([])
+        }
+        else {
+            output['new-value'].data.push(StockServer.dummyData[sym][0]);
+            StockServer.dummyData[sym].unshift({
+                timestamp: new Date().toDateString(),
+                open: StockServer.dummyData[sym][0].close,
+                high: (Math.random() * (max * 2 - max) + max).toFixed(2),
+                low: (Math.random() * (min - 1) + 1).toFixed(2),
+                close: (Math.random() * (max - min) + min).toFixed(2)
+            });
+        }
+        return output;
     };
     StockServer.prototype.listen = function () {
         var _this = this;
@@ -38,27 +88,22 @@ var StockServer = /** @class */ (function () {
             console.log("New Client Connected. Id: ".concat(socket.id));
             var lobby = '';
             /* List check */
-            socket.on('list', function () { return socket.emit('ping', {
+            socket.on('list', function () { return socket.emit('list', {
                 symbols: StockServer.SYMBOLS,
                 'response-type': "list"
             }); });
-            /* Check if lobby exist */
-            // socket.on('checklobby', (lobby: string) => socket.emit('checklobby', this.chatRooms.has(lobby) ? true : false))
-            /* Create lobby */
-            socket.on('create', function () {
-                var lobby = Math.random().toString(36).substring(2, 7); // Generates random lobby name
-                /* If lobby doesn't exist and we haven't exceeded max chatRooms allowed, create a new lobby/game */
-                // if (this.chatRooms.has(lobby) == false && this.chatRooms.size < ChatServer.MAX_ROOMS) {
-                //     console.log(`New Lobby '${lobby}' created`)
-                //     this.chatRooms.set(lobby, new Chat())
-                //     socket.emit('create', lobby)
-                // } else socket.emit('create')
-            });
-            socket.on('isTyping', function () {
-                _this.io.to(lobby).emit('userTyping', socket.id);
-            });
-            socket.on('stoppedTyping', function () {
-                _this.io.to(lobby).emit('userStoppedTyping', socket.id);
+            // Historical
+            socket.on('historical', function (obj) { return socket.emit('historical', _this.getHistoricalData(obj)); });
+            // Live
+            socket.on('live', function (obj) {
+                obj.symbols.forEach(function (sym) {
+                    socket.emit('live', _this.getLiveData(sym));
+                });
+                setInterval(function () {
+                    obj.symbols.forEach(function (sym) {
+                        socket.emit('live', _this.getLiveData(sym));
+                    });
+                }, 5000);
             });
         });
     };
@@ -66,7 +111,8 @@ var StockServer = /** @class */ (function () {
         return this.app;
     };
     StockServer.PORT = 8080; // Default local port
-    StockServer.SYMBOLS = ['ABC', 'XYZ', 'LMNO'];
+    StockServer.SYMBOLS = ['ABC', 'XYZ', 'LMNO', 'PQR', 'FACE', 'APPL'];
+    StockServer.dummyData = {};
     return StockServer;
 }());
 exports.StockServer = StockServer;
