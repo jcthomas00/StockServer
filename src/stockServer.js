@@ -6,23 +6,31 @@ var cors = require("cors");
 var http = require("http");
 var StockServer = /** @class */ (function () {
     function StockServer() {
+        this.maxmin = {};
         this.createApp();
         this.listen();
         this.createDummyData();
     }
     StockServer.prototype.createDummyData = function () {
+        var _this = this;
         StockServer.SYMBOLS.forEach(function (sym) {
             StockServer.dummyData[sym] = [];
-            var time = Date.now(), max = 100, min = 10;
+            var max = Math.random() * (500 - 100) + 100;
+            var min = max - 50;
+            _this.maxmin[sym] = { max: max, min: min };
+            var time = Date.now();
             var prevOpen = '', bool = true;
             var open = '';
             for (var i = 0; i < 100; i++) {
-                open = (Math.random() * (max - min) + min).toFixed(2);
+                var arr = [Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min];
+                arr.sort();
+                arr.reverse();
+                open = arr[1].toFixed(2);
                 StockServer.dummyData[sym].push({
-                    timestamp: new Date(time - i * 86400000).toDateString(),
+                    timestamp: new Date(time - i * 86400000).toString(),
                     open: open,
-                    high: (Math.random() * (max * 2 - max) + max).toFixed(2),
-                    low: (Math.random() * (min - 1) + 1).toFixed(2),
+                    high: arr[0].toFixed(2) > prevOpen ? arr[0].toFixed(2) : prevOpen,
+                    low: arr[2].toFixed(2) < prevOpen || bool ? arr[2].toFixed(2) : prevOpen,
                     close: bool ? (Math.random() * (max - min) + min).toFixed(2) : prevOpen
                 });
                 bool = false;
@@ -59,7 +67,6 @@ var StockServer = /** @class */ (function () {
         return output;
     };
     StockServer.prototype.getLiveData = function (sym) {
-        var max = 100, min = 10;
         var output = {
             "response-type": "live",
             "new-value": { symbol: sym, data: [] }
@@ -68,13 +75,17 @@ var StockServer = /** @class */ (function () {
             //output['new-value'].data.push([])
         }
         else {
+            var max = this.maxmin[sym].max, min = this.maxmin[sym].min;
             output['new-value'].data.push(StockServer.dummyData[sym][0]);
+            var arr = [Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min];
+            arr.sort();
+            arr.reverse();
             StockServer.dummyData[sym].unshift({
-                timestamp: new Date().toDateString(),
+                timestamp: new Date().toString(),
                 open: StockServer.dummyData[sym][0].close,
-                high: (Math.random() * (max * 2 - max) + max).toFixed(2),
-                low: (Math.random() * (min - 1) + 1).toFixed(2),
-                close: (Math.random() * (max - min) + min).toFixed(2)
+                high: arr[0].toFixed(2) > StockServer.dummyData[sym][0].close ? arr[0].toFixed(2) : StockServer.dummyData[sym][0].close,
+                low: arr[2].toFixed(2) < StockServer.dummyData[sym][0].close ? arr[2].toFixed(2) : StockServer.dummyData[sym][0].close,
+                close: arr[1].toFixed(2)
             });
         }
         return output;

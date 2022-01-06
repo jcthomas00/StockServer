@@ -16,6 +16,8 @@ export class StockServer {
     private io: SocketIO.Server
     private port: string | number
 
+    private maxmin: {[symbol:string]: {max: number, min: number}} = {}
+
     constructor() {
         this.createApp()
         this.listen()
@@ -24,17 +26,26 @@ export class StockServer {
 
     private createDummyData():void{
         StockServer.SYMBOLS.forEach((sym) => {
-            StockServer.dummyData[sym] = []
-            const time = Date.now(), max = 100, min = 10;
+            StockServer.dummyData[sym] = [];
+
+            const max = Math.random() * (500 - 100) + 100;
+            const min = max - 50;
+
+            this.maxmin[sym] = {max: max, min: min};
+
+            const time = Date.now()
             let prevOpen = '', bool = true;
             let open = '';
             for(let i = 0; i<100; i++){
-                open = (Math.random()*(max - min) + min).toFixed(2);
+                let arr = [Math.random()*(max - min) + min, Math.random()*(max - min) + min, Math.random()*(max - min) + min];
+                arr.sort();
+                arr.reverse();
+                open = arr[1].toFixed(2);
                 StockServer.dummyData[sym].push({
-                    timestamp: new Date(time-i*86400000).toDateString(),
+                    timestamp: new Date(time-i*86400000).toString(),
                     open: open,
-                    high:  (Math.random()*(max*2 - max) + max).toFixed(2),
-                    low:  (Math.random()*(min - 1) + 1).toFixed(2),
+                    high:  arr[0].toFixed(2) > prevOpen ? arr[0].toFixed(2) : prevOpen,
+                    low:  arr[2].toFixed(2) < prevOpen || bool ? arr[2].toFixed(2) : prevOpen,
                     close:  bool ? (Math.random()*(max - min) + min).toFixed(2):prevOpen
                 })
                 bool = false;
@@ -72,7 +83,6 @@ export class StockServer {
         return output;
     }
     private getLiveData(sym):Interfaces.Live {
-        const max = 100, min = 10;
         const output:Interfaces.Live = {
             "response-type": "live",
             "new-value":{symbol:sym, data: []}
@@ -80,13 +90,17 @@ export class StockServer {
         if(!StockServer.dummyData[sym]){
             //output['new-value'].data.push([])
         }else{
+        const max = this.maxmin[sym].max, min = this.maxmin[sym].min;
         output['new-value'].data.push(StockServer.dummyData[sym][0])
+        let arr = [Math.random()*(max - min) + min, Math.random()*(max - min) + min, Math.random()*(max - min) + min];
+        arr.sort();
+        arr.reverse();
         StockServer.dummyData[sym].unshift({
-            timestamp: new Date().toDateString(),
+            timestamp: new Date().toString(),
             open: StockServer.dummyData[sym][0].close,
-            high:  (Math.random()*(max*2 - max) + max).toFixed(2),
-            low:  (Math.random()*(min - 1) + 1).toFixed(2),
-            close:  (Math.random()*(max - min) + min).toFixed(2)
+            high:  arr[0].toFixed(2) > StockServer.dummyData[sym][0].close ? arr[0].toFixed(2) : StockServer.dummyData[sym][0].close,
+            low:  arr[2].toFixed(2) < StockServer.dummyData[sym][0].close ? arr[2].toFixed(2) : StockServer.dummyData[sym][0].close,
+            close:  arr[1].toFixed(2)
         })
         }
        
