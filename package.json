@@ -18,11 +18,14 @@
   },
   "homepage": "https://github.com/jcthomas00/FakeStockServer#readme",
   "dependencies": {
+    "@types/axios": "^0.14.0",
     "@types/cors": "^2.8.12",
     "@types/socket.io": "^3.0.2",
+    "axios": "^0.24.0",
     "concurrently": "^6.5.1",
     "express": "^4.17.2",
     "nodemon": "^2.0.15",
+    "request": "^2.88.2",
     "socket.io": "^4.4.0"
   }
 }

@@ -20,17 +20,18 @@
         //req #2
         socket.emit("historical", {
             'request-type': "historical",
-            symbols: ['FACE', 'APgPL'],
+            symbols: ['AAPL'],
+            timeframe: 5,
             start: '2021-12-01 02:02:03',
 	    });
 
         socket.on("historical", console.log)
 
         //req #3
-        socket.emit("live", {
-            'request-type': "live",
-            symbols: ['FACE', 'APPL', 'gfcrdcdc']
-	    });
+        // socket.emit("live", {
+        //     'request-type': "live",
+        //     symbols: ['FACE', 'APPL', 'gfcrdcdc'], 
+	    // });
 
         socket.on("live", console.log)
         

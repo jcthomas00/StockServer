@@ -4,12 +4,14 @@ exports.StockServer = void 0;
 var express = require("express");
 var cors = require("cors");
 var http = require("http");
+var request = require("request");
 var StockServer = /** @class */ (function () {
     function StockServer() {
         this.maxmin = {};
         this.createApp();
         this.listen();
         this.createDummyData();
+        this.getRealData();
     }
     StockServer.prototype.createDummyData = function () {
         var _this = this;
@@ -38,6 +40,21 @@ var StockServer = /** @class */ (function () {
             }
         });
     };
+    StockServer.prototype.getRealData = function () {
+        StockServer.SYMBOLS.forEach(function (sym) {
+            StockServer.realData[sym] = [];
+            request.get("https://nabors-stock-database.herokuapp.com/".concat(sym.toLowerCase(), "/5/minute"), function (error, resp, body) {
+                console.log(resp.rows);
+                // StockServer.realData5[sym].push({
+                //     timestamp: new Date(time-i*86400000).toString(),
+                //     open: open,
+                //     high:  arr[0].toFixed(2) > prevOpen ? arr[0].toFixed(2) : prevOpen,
+                //     low:  arr[2].toFixed(2) < prevOpen || bool ? arr[2].toFixed(2) : prevOpen,
+                //     close:  bool ? (Math.random()*(max - min) + min).toFixed(2):prevOpen
+                // })
+            });
+        });
+    };
     StockServer.prototype.createApp = function () {
         this.app = express();
         this.app.use(cors());
@@ -45,13 +62,14 @@ var StockServer = /** @class */ (function () {
         this.port = process.env.PORT || StockServer.PORT;
         this.io = require('socket.io')(this.server, { cors: { origins: '*' } });
     };
+    // obj = string[] = ['AAPL']
     StockServer.prototype.getHistoricalData = function (obj) {
         var output = {
             "response-type": "historical",
             data: []
         };
         obj.symbols.forEach(function (element) {
-            if (!StockServer.dummyData[element]) {
+            if (!StockServer.realData[element]) {
                 output.data.push({
                     symbol: element,
                     data: []
@@ -60,7 +78,7 @@ var StockServer = /** @class */ (function () {
             else {
                 output.data.push({
                     symbol: element,
-                    data: StockServer.dummyData[element].filter(function (dp) { return new Date(dp.timestamp) >= new Date(obj.start); })
+                    data: StockServer.realData[element].filter(function (dp) { return new Date(dp.timestamp) >= new Date(obj.start); })
                 });
             }
         });
@@ -71,20 +89,21 @@ var StockServer = /** @class */ (function () {
             "response-type": "live",
             "new-value": { symbol: sym, data: [] }
         };
-        if (!StockServer.dummyData[sym]) {
+        var tfArr = 'realData' + (StockServer.timeframe === -1 ? '' : StockServer.timeframe);
+        if (!StockServer[tfArr][sym]) {
             //output['new-value'].data.push([])
         }
         else {
             var max = this.maxmin[sym].max, min = this.maxmin[sym].min;
-            output['new-value'].data.push(StockServer.dummyData[sym][0]);
+            output['new-value'].data.push(StockServer.realData5[sym][0]);
             var arr = [Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min];
             arr.sort();
             arr.reverse();
-            StockServer.dummyData[sym].unshift({
+            StockServer[sym].unshift({
                 timestamp: new Date().toString(),
-                open: StockServer.dummyData[sym][0].close,
-                high: arr[0].toFixed(2) > StockServer.dummyData[sym][0].close ? arr[0].toFixed(2) : StockServer.dummyData[sym][0].close,
-                low: arr[2].toFixed(2) < StockServer.dummyData[sym][0].close ? arr[2].toFixed(2) : StockServer.dummyData[sym][0].close,
+                open: StockServer[tfArr][sym][0].close,
+                high: arr[0].toFixed(2) > StockServer[tfArr][sym][0].close ? arr[0].toFixed(2) : StockServer[tfArr][sym][0].close,
+                low: arr[2].toFixed(2) < StockServer[tfArr][sym][0].close ? arr[2].toFixed(2) : StockServer[tfArr][sym][0].close,
                 close: arr[1].toFixed(2)
             });
         }
@@ -122,8 +141,12 @@ var StockServer = /** @class */ (function () {
         return this.app;
     };
     StockServer.PORT = 8080; // Default local port
-    StockServer.SYMBOLS = ['ABC', 'XYZ', 'LMNO', 'PQR', 'FACE', 'APPL'];
+    StockServer.SYMBOLS = ['AAPL'];
     StockServer.dummyData = {};
+    StockServer.realData = {}; // -1
+    StockServer.realData5 = {}; // 5
+    StockServer.realData15 = {}; // timeframe = 15
+    StockServer.realData60 = {}; // timeframe = 60
     return StockServer;
 }());
 exports.StockServer = StockServer;
