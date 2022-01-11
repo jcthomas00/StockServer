@@ -5,7 +5,6 @@ import * as http from 'http'
 import * as SocketIO from 'socket.io'
 import * as Interfaces from './Interfaces'
 import * as request from 'request'
-import axios, { AxiosResponse } from 'axios';
 
 export class StockServer {
 
