@@ -18,6 +18,7 @@ export class StockServer {
     public static realData15:{[symbol:string]:Interfaces.DataPoint[]} = {} // timeframe = 15
     public static realData60:{[symbol:string]:Interfaces.DataPoint[]} = {} // timeframe = 60
     public static timeframe:number
+    
 
     private app: express.Application
     private server: http.Server
@@ -25,7 +26,8 @@ export class StockServer {
     private port: string | number
 
     private maxmin: {[symbol:string]: {max: number, min: number}} = {}
-
+    private tfArr:string
+    
     constructor() {
         this.createApp()
         this.listen()
@@ -64,21 +66,35 @@ export class StockServer {
     }
 
     private getRealData():void {
-        StockServer.SYMBOLS.forEach((sym) => {
-            StockServer.realData[sym] = []
-            request.get(`https://nabors-stock-database.herokuapp.com/${sym.toLowerCase()}/5/minute`, (error, resp:any, body) => {
-                console.log(resp.rows)
+        let timeframes = [
+            // {'path': 'daily', "array": 'realData'}, 
+            {'path': '5/minute', "array": 'realData5'}
+            // {'path': '15/minute', "array": 'realData15'}, 
+            // {'path': '60/minute', "array": 'realData60'}, 
+        ]
+
+        timeframes.forEach(tf => {
+            StockServer.SYMBOLS.forEach((sym) => {
+
+            StockServer[tf.array][sym] = []
+            request.get(`https://nabors-stock-database.herokuapp.com/${sym.toLowerCase()}/${tf.path}`, (error, resp:any, body) => {
+                let data = JSON.parse(body)
                 
-                // StockServer.realData5[sym].push({
-                //     timestamp: new Date(time-i*86400000).toString(),
-                //     open: open,
-                //     high:  arr[0].toFixed(2) > prevOpen ? arr[0].toFixed(2) : prevOpen,
-                //     low:  arr[2].toFixed(2) < prevOpen || bool ? arr[2].toFixed(2) : prevOpen,
-                //     close:  bool ? (Math.random()*(max - min) + min).toFixed(2):prevOpen
-                // })
-                
+                data.forEach(element => {
+                    StockServer[tf.array][sym].push({
+                        timestamp: element.date,
+                        open: element.open,
+                        high: element.high,
+                        low: element.low,
+                        close: element.close
+                    })
+                });
+
+                console.log(tf.array, StockServer[tf.array])
             })
         })
+        })
+        
     }
 
     private createApp(): void {
@@ -89,15 +105,15 @@ export class StockServer {
         this.io = require('socket.io')(this.server, { cors: { origins: '*' } })
     }
 
-    // obj = string[] = ['AAPL']
-
     private getHistoricalData(obj):Interfaces.Historical {
+        StockServer.timeframe = obj.timeframe
         const output:Interfaces.Historical = {
             "response-type": "historical",
             data:[]
         };
+        this.tfArr = 'realData'+(StockServer.timeframe === -1 ? '' : StockServer.timeframe)
         obj.symbols.forEach(element => {
-            if(!StockServer.realData[element]){
+            if(!StockServer[this.tfArr][element]){
                 output.data.push({
                     symbol:element, 
                     data:[]
@@ -105,10 +121,11 @@ export class StockServer {
             }else{
             output.data.push({
                     symbol:element, 
-                    data:StockServer.realData[element].filter(dp => new Date(dp.timestamp) >= new Date(obj.start))
+                    data:StockServer[this.tfArr][element].filter(dp => new Date(dp.timestamp) >= new Date(obj.start))
                 })
             }
         });
+        console.log(output)
         return output;
     }
 
@@ -117,21 +134,20 @@ export class StockServer {
             "response-type": "live",
             "new-value":{symbol:sym, data: []}
         };
-        let tfArr = 'realData'+(StockServer.timeframe === -1 ? '' : StockServer.timeframe)
-        if(!StockServer[tfArr][sym]){
+        if(!StockServer[this.tfArr][sym]){
             //output['new-value'].data.push([])
         }else{
         const max = this.maxmin[sym].max, min = this.maxmin[sym].min;
-        output['new-value'].data.push(StockServer.realData5[sym][0])
+        output['new-value'].data.push(StockServer[this.tfArr][sym][0])
         let arr = [Math.random()*(max - min) + min, Math.random()*(max - min) + min, Math.random()*(max - min) + min];
         arr.sort();
         arr.reverse();
         
         StockServer[sym].unshift({
             timestamp: new Date().toString(),
-            open: StockServer[tfArr][sym][0].close,
-            high:  arr[0].toFixed(2) > StockServer[tfArr][sym][0].close ? arr[0].toFixed(2) : StockServer[tfArr][sym][0].close,
-            low:  arr[2].toFixed(2) < StockServer[tfArr][sym][0].close ? arr[2].toFixed(2) : StockServer[tfArr][sym][0].close,
+            open: StockServer[this.tfArr][sym][0].close,
+            high:  arr[0].toFixed(2) > StockServer[this.tfArr][sym][0].close ? arr[0].toFixed(2) : StockServer[this.tfArr][sym][0].close,
+            low:  arr[2].toFixed(2) < StockServer[this.tfArr][sym][0].close ? arr[2].toFixed(2) : StockServer[this.tfArr][sym][0].close,
             close:  arr[1].toFixed(2)
         })
         }
