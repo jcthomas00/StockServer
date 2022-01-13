@@ -108,19 +108,20 @@ var StockServer = /** @class */ (function () {
             //output['new-value'].data.push([])
         }
         else {
-            var lastVals = StockServer[this.tfArr][sym][0];
-            var rand = 1 - (Math.random() * 2);
-            //console.log("rand: ",rand)
-            var newClose = StockServer[this.tfArr][sym][0].close + (rand);
+            var lastVals = StockServer[this.tfArr][sym][StockServer[this.tfArr][sym].length - 1];
+            var rand = (1 - (Math.random() * 2)) / 50;
+            console.log("rand: ", rand);
+            var newClose = lastVals.close + (rand);
             var newValue = {
-                timestamp: new Date('2021-01-20T16:55:00.000Z').toISOString(),
+                timestamp: new Date('2021-01-20T09:00:00.000Z').toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
                 low: newClose < lastVals.low ? newClose : lastVals.low,
                 close: newClose
             };
             output['new-value'].data.push(newValue);
-            StockServer[this.tfArr][sym][0] = newValue;
+            StockServer[this.tfArr][sym][StockServer[this.tfArr][sym].length - 1] = newValue;
+            console.log(newValue);
         }
         return output;
     };
@@ -156,7 +157,7 @@ var StockServer = /** @class */ (function () {
         return this.app;
     };
     StockServer.PORT = 8080; // Default local port
-    StockServer.SYMBOLS = ['AAPL'];
+    StockServer.SYMBOLS = ['AAPL', 'TSLA'];
     StockServer.dummyData = {};
     StockServer.realData = {}; // -1
     StockServer.realData5 = {}; // 5

@@ -9,7 +9,7 @@ import * as request from 'request'
 export class StockServer {
 
     public static readonly PORT: number = 8080 // Default local port
-    public static readonly SYMBOLS: string[] = ['AAPL'];
+    public static readonly SYMBOLS: string[] = ['AAPL', 'TSLA'];
 
     public static dummyData:{[symbol:string]:Interfaces.DataPoint[]} = {}
     public static realData:{[symbol:string]:Interfaces.DataPoint[]} = {} // -1
@@ -137,19 +137,22 @@ export class StockServer {
         if(!StockServer[this.tfArr][sym]){
             //output['new-value'].data.push([])
         }else{
-            const lastVals = StockServer[this.tfArr][sym][0];
-            const rand = 1-(Math.random()*2);
-            //console.log("rand: ",rand)
-            const newClose = StockServer[this.tfArr][sym][0].close + (rand)
+            const lastVals = StockServer[this.tfArr][sym][StockServer[this.tfArr][sym].length - 1];
+            const rand = (1-(Math.random()*2))/50;
+            
+            console.log("rand: ",rand)
+            const newClose = lastVals.close + (rand)
+            
             const newValue = {
-                timestamp: new Date('2021-01-20T16:55:00.000Z').toISOString(),
+                timestamp: new Date('2021-01-20T09:00:00.000Z').toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
                 low:  newClose < lastVals.low ? newClose : lastVals.low ,
                 close:  newClose
             }
             output['new-value'].data.push(newValue);
-            StockServer[this.tfArr][sym][0] = newValue;
+            StockServer[this.tfArr][sym][StockServer[this.tfArr][sym].length - 1] = newValue;
+            console.log(newValue)
         }
         return output;
     }
