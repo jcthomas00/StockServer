@@ -61,7 +61,7 @@ var StockServer = /** @class */ (function () {
                             close: element.close
                         });
                     });
-                    console.log(tf.array, StockServer[tf.array]);
+                    //console.log(tf.array, StockServer[tf.array])
                 });
             });
         });
@@ -95,7 +95,8 @@ var StockServer = /** @class */ (function () {
                 });
             }
         });
-        console.log(output);
+        console.log("first: ", output.data[0].data[0]);
+        console.log("last: ", output.data[0].data[output.data[0].data.length - 1]);
         return output;
     };
     StockServer.prototype.getLiveData = function (sym) {
@@ -107,18 +108,19 @@ var StockServer = /** @class */ (function () {
             //output['new-value'].data.push([])
         }
         else {
-            var max = this.maxmin[sym].max, min = this.maxmin[sym].min;
-            output['new-value'].data.push(StockServer[this.tfArr][sym][0]);
-            var arr = [Math.random() * (max - min) + min, Math.random() * (max - min) + min, Math.random() * (max - min) + min];
-            arr.sort();
-            arr.reverse();
-            StockServer[sym].unshift({
-                timestamp: new Date().toString(),
-                open: StockServer[this.tfArr][sym][0].close,
-                high: arr[0].toFixed(2) > StockServer[this.tfArr][sym][0].close ? arr[0].toFixed(2) : StockServer[this.tfArr][sym][0].close,
-                low: arr[2].toFixed(2) < StockServer[this.tfArr][sym][0].close ? arr[2].toFixed(2) : StockServer[this.tfArr][sym][0].close,
-                close: arr[1].toFixed(2)
-            });
+            var lastVals = StockServer[this.tfArr][sym][0];
+            var rand = 1 - (Math.random() * 2);
+            //console.log("rand: ",rand)
+            var newClose = StockServer[this.tfArr][sym][0].close + (rand);
+            var newValue = {
+                timestamp: new Date('2021-01-20T16:55:00.000Z').toISOString(),
+                open: lastVals.close,
+                high: newClose > lastVals.high ? newClose : lastVals.high,
+                low: newClose < lastVals.low ? newClose : lastVals.low,
+                close: newClose
+            };
+            output['new-value'].data.push(newValue);
+            StockServer[this.tfArr][sym][0] = newValue;
         }
         return output;
     };
