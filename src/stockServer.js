@@ -43,8 +43,8 @@ var StockServer = /** @class */ (function () {
     StockServer.prototype.getRealData = function () {
         var timeframes = [
             // {'path': 'daily', "array": 'realData'}, 
-            { 'path': '5/minute', "array": 'realData5' }
-            // {'path': '15/minute', "array": 'realData15'}, 
+            { 'path': '5/minute', "array": 'realData5' },
+            { 'path': '15/minute', "array": 'realData15' },
             // {'path': '60/minute', "array": 'realData60'}, 
         ];
         timeframes.forEach(function (tf) {
@@ -75,6 +75,7 @@ var StockServer = /** @class */ (function () {
     };
     StockServer.prototype.getHistoricalData = function (obj) {
         var _this = this;
+        console.log(obj);
         StockServer.timeframe = obj.timeframe;
         var output = {
             "response-type": "historical",
@@ -109,11 +110,12 @@ var StockServer = /** @class */ (function () {
         }
         else {
             var lastVals = StockServer[this.tfArr][sym][StockServer[this.tfArr][sym].length - 1];
+            console.log(lastVals, sym);
             var rand = (1 - (Math.random() * 2)) / 50;
             console.log("rand: ", rand);
             var newClose = lastVals.close + (rand);
             var newValue = {
-                timestamp: new Date('2021-01-20T09:00:00.000Z').toISOString(),
+                timestamp: new Date('2022-01-13T09:30:00.000Z').toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
                 low: newClose < lastVals.low ? newClose : lastVals.low,

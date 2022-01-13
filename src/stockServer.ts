@@ -6,6 +6,8 @@ import * as SocketIO from 'socket.io'
 import * as Interfaces from './Interfaces'
 import * as request from 'request'
 
+
+
 export class StockServer {
 
     public static readonly PORT: number = 8080 // Default local port
@@ -67,8 +69,8 @@ export class StockServer {
     private getRealData():void {
         let timeframes = [
             // {'path': 'daily', "array": 'realData'}, 
-            {'path': '5/minute', "array": 'realData5'}
-            // {'path': '15/minute', "array": 'realData15'}, 
+            {'path': '5/minute', "array": 'realData5'},
+            {'path': '15/minute', "array": 'realData15'}, 
             // {'path': '60/minute', "array": 'realData60'}, 
         ]
 
@@ -105,6 +107,7 @@ export class StockServer {
     }
 
     private getHistoricalData(obj):Interfaces.Historical {
+        console.log(obj)
         StockServer.timeframe = obj.timeframe
         const output:Interfaces.Historical = {
             "response-type": "historical",
@@ -138,13 +141,14 @@ export class StockServer {
             //output['new-value'].data.push([])
         }else{
             const lastVals = StockServer[this.tfArr][sym][StockServer[this.tfArr][sym].length - 1];
+            console.log(lastVals, sym)
             const rand = (1-(Math.random()*2))/50;
             
             console.log("rand: ",rand)
             const newClose = lastVals.close + (rand)
             
             const newValue = {
-                timestamp: new Date('2021-01-20T09:00:00.000Z').toISOString(),
+                timestamp: new Date('2022-01-13T09:30:00.000Z').toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
                 low:  newClose < lastVals.low ? newClose : lastVals.low ,
