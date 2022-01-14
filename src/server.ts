@@ -1,7 +1,8 @@
 import { StockServer } from './stockServer'
+import { ArrayServer } from './arrayServer'
 import * as cors from 'cors'
 
-let app = new StockServer().getApp()
+let app = new ArrayServer().getApp()
 app.use(cors());
 export { app }
 
