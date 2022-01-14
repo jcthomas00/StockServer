@@ -148,7 +148,7 @@ export class StockServer {
             const newClose = lastVals.close + (rand)
             
             const newValue = {
-                timestamp: new Date('2022-01-13T09:30:00.000Z').toISOString(),
+                timestamp: new Date('2022-01-14T09:30:00.000Z').toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
                 low:  newClose < lastVals.low ? newClose : lastVals.low ,
