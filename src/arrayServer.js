@@ -53,13 +53,16 @@ var ArrayServer = /** @class */ (function () {
                 var rawData = require(url);
                 if (rawData) {
                     // let data = JSON.parse(rawData.values[0])
+                    //console.log(rawData.values)
+                    console.log(tf.array);
                     rawData.values.forEach(function (element) {
+                        //  console.log(element)
                         ArrayServer[tf.array][sym].push({
-                            timestamp: element.date,
-                            open: element.open,
-                            high: element.high,
-                            low: element.low,
-                            close: element.close
+                            timestamp: element[0],
+                            open: element[2],
+                            high: element[4],
+                            low: element[5],
+                            close: element[3]
                         });
                     });
                 }
