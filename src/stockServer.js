@@ -42,10 +42,10 @@ var StockServer = /** @class */ (function () {
     };
     StockServer.prototype.getRealData = function () {
         var timeframes = [
-            // {'path': 'daily', "array": 'realData'}, 
+            { 'path': '1/day', "array": 'realData' },
             { 'path': '5/minute', "array": 'realData5' },
             { 'path': '15/minute', "array": 'realData15' },
-            // {'path': '60/minute', "array": 'realData60'}, 
+            { 'path': '1/hour', "array": 'realData60' },
         ];
         timeframes.forEach(function (tf) {
             StockServer.SYMBOLS.forEach(function (sym) {
@@ -159,7 +159,7 @@ var StockServer = /** @class */ (function () {
         return this.app;
     };
     StockServer.PORT = 8080; // Default local port
-    StockServer.SYMBOLS = ['AAPL', 'TSLA'];
+    StockServer.SYMBOLS = ['AAPL', 'TSLA', 'NVDA', 'JPM', 'BAC'];
     StockServer.dummyData = {};
     StockServer.realData = {}; // -1
     StockServer.realData5 = {}; // 5

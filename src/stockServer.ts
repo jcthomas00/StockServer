@@ -11,7 +11,7 @@ import * as request from 'request'
 export class StockServer {
 
     public static readonly PORT: number = 8080 // Default local port
-    public static readonly SYMBOLS: string[] = ['AAPL', 'TSLA'];
+    public static readonly SYMBOLS: string[] = ['AAPL','TSLA', 'NVDA', 'JPM', 'BAC'];
 
     public static dummyData:{[symbol:string]:Interfaces.DataPoint[]} = {}
     public static realData:{[symbol:string]:Interfaces.DataPoint[]} = {} // -1
@@ -68,10 +68,10 @@ export class StockServer {
 
     private getRealData():void {
         let timeframes = [
-            // {'path': 'daily', "array": 'realData'}, 
+            {'path': '1/day', "array": 'realData'}, 
             {'path': '5/minute', "array": 'realData5'},
             {'path': '15/minute', "array": 'realData15'}, 
-            // {'path': '60/minute', "array": 'realData60'}, 
+            {'path': '1/hour', "array": 'realData60'}, 
         ]
 
         timeframes.forEach(tf => {
