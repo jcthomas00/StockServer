@@ -83,13 +83,11 @@ export class ArrayServer {
             ArrayServer[tf.array][sym] = []
             let url = `../realData/${tf.path}/${sym}.json`
             let rawData = require(url);
-            console.log(rawData.values[0])
             
             if(rawData) {
-                    console.log(url, tf.array, tf.path)
-                    let data = JSON.parse(rawData.values[0])
+                    // let data = JSON.parse(rawData.values[0])
                 
-                    data.forEach(element => {
+                    rawData.values.forEach(element => {
                     ArrayServer[tf.array][sym].push({
                         timestamp: element.date,
                         open: element.open,
@@ -145,9 +143,12 @@ export class ArrayServer {
             "response-type": "live",
             "new-value":{symbol:sym, data: []}
         };
+        console.log('this.tfArr', this.tfArr)
+       // console.log(ArrayServer[this.tfArr])
         if(!ArrayServer[this.tfArr][sym]){
             //output['new-value'].data.push([])
         }else{
+            
             const lastVals = ArrayServer[this.tfArr][sym][ArrayServer[this.tfArr][sym].length - 1];
             console.log(lastVals, sym)
             const rand = (1-(Math.random()*2))/50;
@@ -159,7 +160,7 @@ export class ArrayServer {
                 timestamp: new Date('2022-01-14T09:30:00.000Z').toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
-                low:  newClose < lastVals.low ? newClose : lastVals.low ,
+                low:  newClose < lastVals.low ? newClose : lastVals.low,
                 close:  newClose
             }
             output['new-value'].data.push(newValue);

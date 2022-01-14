@@ -51,11 +51,9 @@ var ArrayServer = /** @class */ (function () {
                 ArrayServer[tf.array][sym] = [];
                 var url = "../realData/".concat(tf.path, "/").concat(sym, ".json");
                 var rawData = require(url);
-                console.log(rawData.values[0]);
                 if (rawData) {
-                    console.log(url, tf.array, tf.path);
-                    var data = JSON.parse(rawData.values[0]);
-                    data.forEach(function (element) {
+                    // let data = JSON.parse(rawData.values[0])
+                    rawData.values.forEach(function (element) {
                         ArrayServer[tf.array][sym].push({
                             timestamp: element.date,
                             open: element.open,
@@ -110,6 +108,8 @@ var ArrayServer = /** @class */ (function () {
             "response-type": "live",
             "new-value": { symbol: sym, data: [] }
         };
+        console.log('this.tfArr', this.tfArr);
+        // console.log(ArrayServer[this.tfArr])
         if (!ArrayServer[this.tfArr][sym]) {
             //output['new-value'].data.push([])
         }
