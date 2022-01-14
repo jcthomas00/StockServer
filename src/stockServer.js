@@ -42,7 +42,7 @@ var StockServer = /** @class */ (function () {
     };
     StockServer.prototype.getRealData = function () {
         var timeframes = [
-            { 'path': '1/day', "array": 'realData' },
+            { 'path': 'daily', "array": 'realData' },
             { 'path': '5/minute', "array": 'realData5' },
             { 'path': '15/minute', "array": 'realData15' },
             { 'path': '1/hour', "array": 'realData60' },
@@ -51,16 +51,21 @@ var StockServer = /** @class */ (function () {
             StockServer.SYMBOLS.forEach(function (sym) {
                 StockServer[tf.array][sym] = [];
                 request.get("https://nabors-stock-database.herokuapp.com/".concat(sym.toLowerCase(), "/").concat(tf.path), function (error, resp, body) {
-                    var data = JSON.parse(body);
-                    data.forEach(function (element) {
-                        StockServer[tf.array][sym].push({
-                            timestamp: element.date,
-                            open: element.open,
-                            high: element.high,
-                            low: element.low,
-                            close: element.close
+                    if (body) {
+                        var data = JSON.parse(body);
+                        data.forEach(function (element) {
+                            StockServer[tf.array][sym].push({
+                                timestamp: element.date,
+                                open: element.open,
+                                high: element.high,
+                                low: element.low,
+                                close: element.close
+                            });
                         });
-                    });
+                    }
+                    else {
+                        console.log('no data');
+                    }
                     //console.log(tf.array, StockServer[tf.array])
                 });
             });

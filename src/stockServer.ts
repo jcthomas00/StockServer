@@ -68,7 +68,7 @@ export class StockServer {
 
     private getRealData():void {
         let timeframes = [
-            {'path': '1/day', "array": 'realData'}, 
+            {'path': 'daily', "array": 'realData'}, 
             {'path': '5/minute', "array": 'realData5'},
             {'path': '15/minute', "array": 'realData15'}, 
             {'path': '1/hour', "array": 'realData60'}, 
@@ -79,9 +79,10 @@ export class StockServer {
 
             StockServer[tf.array][sym] = []
             request.get(`https://nabors-stock-database.herokuapp.com/${sym.toLowerCase()}/${tf.path}`, (error, resp:any, body) => {
-                let data = JSON.parse(body)
+            if(body) {
+                    let data = JSON.parse(body)
                 
-                data.forEach(element => {
+                    data.forEach(element => {
                     StockServer[tf.array][sym].push({
                         timestamp: element.date,
                         open: element.open,
@@ -90,6 +91,10 @@ export class StockServer {
                         close: element.close
                     })
                 });
+                } else {
+                    console.log('no data')
+                }
+                
 
                 //console.log(tf.array, StockServer[tf.array])
             })
