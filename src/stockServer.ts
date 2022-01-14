@@ -11,7 +11,7 @@ import * as request from 'request'
 export class StockServer {
 
     public static readonly PORT: number = 8080 // Default local port
-    public static readonly SYMBOLS: string[] = ['AAPL','TSLA', 'NVDA', 'JPM', 'BAC'];
+    public static readonly SYMBOLS: string[] = ['AAPL'];
 
     public static dummyData:{[symbol:string]:Interfaces.DataPoint[]} = {}
     public static realData:{[symbol:string]:Interfaces.DataPoint[]} = {} // -1
@@ -68,19 +68,22 @@ export class StockServer {
 
     private getRealData():void {
         let timeframes = [
-            {'path': 'daily', "array": 'realData'}, 
+            //{'path': 'daily', "array": 'realData'}, 
             {'path': '5/minute', "array": 'realData5'},
-            {'path': '15/minute', "array": 'realData15'}, 
-            {'path': '1/hour', "array": 'realData60'}, 
+            // {'path': '15/minute', "array": 'realData15'}, 
+            //{'path': '1/hour', "array": 'realData60'}, 
         ]
 
-        timeframes.forEach(tf => {
-            StockServer.SYMBOLS.forEach((sym) => {
+        timeframes.forEach( (tf:any) => {
+            StockServer.SYMBOLS.forEach(async (sym) => {
 
             StockServer[tf.array][sym] = []
-            request.get(`https://nabors-stock-database.herokuapp.com/${sym.toLowerCase()}/${tf.path}`, (error, resp:any, body) => {
+                //fetch(`https://nabors-stock-database.herokuapp.com/${sym.toLowerCase()}/${tf.path}`)
+                console.log(`https://nabors-stock-database.herokuapp.com/${sym.toLowerCase()}/${tf.path}`)
+            await request.get(`https://nabors-stock-database.herokuapp.com/${sym.toLowerCase()}/${tf.path}`, (error:any, resp:any, body:any) => {
+                //console.log(resp.body)
             if(body) {
-                    let data = JSON.parse(body)
+                    let data = JSON.parse(resp.body)
                 
                     data.forEach(element => {
                     StockServer[tf.array][sym].push({
@@ -92,7 +95,7 @@ export class StockServer {
                     })
                 });
                 } else {
-                    console.log('no data')
+                    console.log('no data', error)
                 }
                 
 
