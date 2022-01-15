@@ -1,20 +1,13 @@
 import * as express from 'express'
-import { Request, Response, NextFunction } from 'express';
 import * as cors from 'cors'
 import * as http from 'http'
 import * as SocketIO from 'socket.io'
 import * as Interfaces from './Interfaces'
-import * as request from 'request'
-import * as fs from 'fs'
-
-
-
-
 
 export class ArrayServer {
 
     public static readonly PORT: number = 8080 // Default local port
-    public static readonly SYMBOLS: string[] = ['AAPL'];
+    public static readonly SYMBOLS: string[] = ['AAPL','TSLA', 'NVDA', 'JPM', 'BAC'];
     //,'TSLA', 'NVDA', 'JPM', 'BAC'
     public static dummyData:{[symbol:string]:Interfaces.DataPoint[]} = {}
     public static realData:{[symbol:string]:Interfaces.DataPoint[]} = {} // -1
@@ -35,7 +28,7 @@ export class ArrayServer {
     constructor() {
         this.createApp()
         this.listen()
-        this.createDummyData()
+        //this.createDummyData()
         this.getRealData()
     }
 
@@ -78,6 +71,7 @@ export class ArrayServer {
         ]
 
         timeframes.forEach(tf => {
+            console.log("arr | path: ", tf.array, tf.path)
             ArrayServer.SYMBOLS.forEach((sym) => {
 
             ArrayServer[tf.array][sym] = []
@@ -85,11 +79,7 @@ export class ArrayServer {
             let rawData = require(url);
             
             if(rawData) {
-                    // let data = JSON.parse(rawData.values[0])
-                    //console.log(rawData.values)
-                    console.log(tf.array)
-                    rawData.values.forEach(element => {
-                      //  console.log(element)
+                    rawData.values.forEach(element => {console
                     ArrayServer[tf.array][sym].push({
                         timestamp: element[0],
                         open: element[2],
@@ -116,13 +106,15 @@ export class ArrayServer {
     }
 
     private getHistoricalData(obj):Interfaces.Historical {
-        console.log(obj)
+        console.log("getHistoricalData: ", obj.timeframe)
         ArrayServer.timeframe = obj.timeframe
         const output:Interfaces.Historical = {
             "response-type": "historical",
             data:[]
         };
-        this.tfArr = 'realData'+(ArrayServer.timeframe === -1 ? '' : ArrayServer.timeframe)
+        this.tfArr = 'realData'+(ArrayServer.timeframe == -1 ? '' : ArrayServer.timeframe)
+
+        console.log('this.tfArr', this.tfArr)
         obj.symbols.forEach(element => {
             if(!ArrayServer[this.tfArr][element]){
                 output.data.push({
@@ -146,21 +138,20 @@ export class ArrayServer {
             "response-type": "live",
             "new-value":{symbol:sym, data: []}
         };
-        console.log('this.tfArr', this.tfArr)
        // console.log(ArrayServer[this.tfArr])
         if(!ArrayServer[this.tfArr][sym]){
             //output['new-value'].data.push([])
         }else{
             
             const lastVals = ArrayServer[this.tfArr][sym][ArrayServer[this.tfArr][sym].length - 1];
-            console.log(lastVals, sym)
+            //console.log(lastVals, sym)
             const rand = (1-(Math.random()*2))/50;
             
-            console.log("rand: ",rand)
+            //console.log("rand: ",rand)
             const newClose = lastVals.close + (rand)
             
             const newValue = {
-                timestamp: new Date('2022-01-14T09:30:00.000Z').toISOString(),
+                timestamp: new Date('2022-01-15T09:30:00.000Z').toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
                 low:  newClose < lastVals.low ? newClose : lastVals.low,
@@ -168,7 +159,7 @@ export class ArrayServer {
             }
             output['new-value'].data.push(newValue);
             ArrayServer[this.tfArr][sym][ArrayServer[this.tfArr][sym].length - 1] = newValue;
-            console.log(newValue)
+           // console.log(newValue)
         }
         return output;
     }

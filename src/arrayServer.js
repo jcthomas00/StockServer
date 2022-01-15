@@ -9,7 +9,7 @@ var ArrayServer = /** @class */ (function () {
         this.maxmin = {};
         this.createApp();
         this.listen();
-        this.createDummyData();
+        //this.createDummyData()
         this.getRealData();
     }
     ArrayServer.prototype.createDummyData = function () {
@@ -47,16 +47,14 @@ var ArrayServer = /** @class */ (function () {
             { 'path': '1hour', "array": 'realData60' },
         ];
         timeframes.forEach(function (tf) {
+            console.log("arr | path: ", tf.array, tf.path);
             ArrayServer.SYMBOLS.forEach(function (sym) {
                 ArrayServer[tf.array][sym] = [];
                 var url = "../realData/".concat(tf.path, "/").concat(sym, ".json");
                 var rawData = require(url);
                 if (rawData) {
-                    // let data = JSON.parse(rawData.values[0])
-                    //console.log(rawData.values)
-                    console.log(tf.array);
                     rawData.values.forEach(function (element) {
-                        //  console.log(element)
+                        console;
                         ArrayServer[tf.array][sym].push({
                             timestamp: element[0],
                             open: element[2],
@@ -81,13 +79,14 @@ var ArrayServer = /** @class */ (function () {
     };
     ArrayServer.prototype.getHistoricalData = function (obj) {
         var _this = this;
-        console.log(obj);
+        console.log("getHistoricalData: ", obj.timeframe);
         ArrayServer.timeframe = obj.timeframe;
         var output = {
             "response-type": "historical",
             data: []
         };
-        this.tfArr = 'realData' + (ArrayServer.timeframe === -1 ? '' : ArrayServer.timeframe);
+        this.tfArr = 'realData' + (ArrayServer.timeframe == -1 ? '' : ArrayServer.timeframe);
+        console.log('this.tfArr', this.tfArr);
         obj.symbols.forEach(function (element) {
             if (!ArrayServer[_this.tfArr][element]) {
                 output.data.push({
@@ -111,19 +110,18 @@ var ArrayServer = /** @class */ (function () {
             "response-type": "live",
             "new-value": { symbol: sym, data: [] }
         };
-        console.log('this.tfArr', this.tfArr);
         // console.log(ArrayServer[this.tfArr])
         if (!ArrayServer[this.tfArr][sym]) {
             //output['new-value'].data.push([])
         }
         else {
             var lastVals = ArrayServer[this.tfArr][sym][ArrayServer[this.tfArr][sym].length - 1];
-            console.log(lastVals, sym);
+            //console.log(lastVals, sym)
             var rand = (1 - (Math.random() * 2)) / 50;
-            console.log("rand: ", rand);
+            //console.log("rand: ",rand)
             var newClose = lastVals.close + (rand);
             var newValue = {
-                timestamp: new Date('2022-01-14T09:30:00.000Z').toISOString(),
+                timestamp: new Date('2022-01-15T09:30:00.000Z').toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
                 low: newClose < lastVals.low ? newClose : lastVals.low,
@@ -131,7 +129,7 @@ var ArrayServer = /** @class */ (function () {
             };
             output['new-value'].data.push(newValue);
             ArrayServer[this.tfArr][sym][ArrayServer[this.tfArr][sym].length - 1] = newValue;
-            console.log(newValue);
+            // console.log(newValue)
         }
         return output;
     };
@@ -167,7 +165,7 @@ var ArrayServer = /** @class */ (function () {
         return this.app;
     };
     ArrayServer.PORT = 8080; // Default local port
-    ArrayServer.SYMBOLS = ['AAPL'];
+    ArrayServer.SYMBOLS = ['AAPL', 'TSLA', 'NVDA', 'JPM', 'BAC'];
     //,'TSLA', 'NVDA', 'JPM', 'BAC'
     ArrayServer.dummyData = {};
     ArrayServer.realData = {}; // -1
