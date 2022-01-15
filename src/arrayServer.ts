@@ -75,7 +75,7 @@ export class ArrayServer {
             ArrayServer.SYMBOLS.forEach((sym) => {
 
             ArrayServer[tf.array][sym] = []
-            let url = `../realData/${tf.path}/${sym}.json`
+            let url = `./realData/${tf.path}/${sym}.json`
             let rawData = require(url);
             
             if(rawData) {
@@ -114,7 +114,6 @@ export class ArrayServer {
         };
         this.tfArr = 'realData'+(ArrayServer.timeframe == -1 ? '' : ArrayServer.timeframe)
 
-        console.log('this.tfArr', this.tfArr)
         obj.symbols.forEach(element => {
             if(!ArrayServer[this.tfArr][element]){
                 output.data.push({
@@ -151,7 +150,7 @@ export class ArrayServer {
             const newClose = lastVals.close + (rand)
             
             const newValue = {
-                timestamp: new Date('2022-01-15T09:30:00.000Z').toISOString(),
+                timestamp: new Date().toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
                 low:  newClose < lastVals.low ? newClose : lastVals.low,

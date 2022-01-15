@@ -4,6 +4,7 @@ import * as cors from 'cors'
 
 let app = new ArrayServer().getApp()
 app.use(cors());
+
 export { app }
 
 app.get('/', (req, res) => {

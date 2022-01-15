@@ -50,7 +50,7 @@ var ArrayServer = /** @class */ (function () {
             console.log("arr | path: ", tf.array, tf.path);
             ArrayServer.SYMBOLS.forEach(function (sym) {
                 ArrayServer[tf.array][sym] = [];
-                var url = "../realData/".concat(tf.path, "/").concat(sym, ".json");
+                var url = "./realData/".concat(tf.path, "/").concat(sym, ".json");
                 var rawData = require(url);
                 if (rawData) {
                     rawData.values.forEach(function (element) {
@@ -86,7 +86,6 @@ var ArrayServer = /** @class */ (function () {
             data: []
         };
         this.tfArr = 'realData' + (ArrayServer.timeframe == -1 ? '' : ArrayServer.timeframe);
-        console.log('this.tfArr', this.tfArr);
         obj.symbols.forEach(function (element) {
             if (!ArrayServer[_this.tfArr][element]) {
                 output.data.push({
@@ -121,7 +120,7 @@ var ArrayServer = /** @class */ (function () {
             //console.log("rand: ",rand)
             var newClose = lastVals.close + (rand);
             var newValue = {
-                timestamp: new Date('2022-01-15T09:30:00.000Z').toISOString(),
+                timestamp: new Date().toISOString(),
                 open: lastVals.close,
                 high: newClose > lastVals.high ? newClose : lastVals.high,
                 low: newClose < lastVals.low ? newClose : lastVals.low,
