@@ -75,7 +75,8 @@ export class ArrayServer {
             ArrayServer.SYMBOLS.forEach((sym) => {
 
             ArrayServer[tf.array][sym] = []
-            let url = `./realData/${tf.path}/${sym}.json`
+            console.log(__dirname)
+            let url = `${__dirname}/realData/${tf.path}/${sym}.json`
             let rawData = require(url);
             
             if(rawData) {

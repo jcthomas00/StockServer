@@ -50,7 +50,8 @@ var ArrayServer = /** @class */ (function () {
             console.log("arr | path: ", tf.array, tf.path);
             ArrayServer.SYMBOLS.forEach(function (sym) {
                 ArrayServer[tf.array][sym] = [];
-                var url = "./realData/".concat(tf.path, "/").concat(sym, ".json");
+                console.log(__dirname);
+                var url = "".concat(__dirname, "/realData/").concat(tf.path, "/").concat(sym, ".json");
                 var rawData = require(url);
                 if (rawData) {
                     rawData.values.forEach(function (element) {
