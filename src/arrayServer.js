@@ -4,6 +4,8 @@ exports.ArrayServer = void 0;
 var express = require("express");
 var cors = require("cors");
 var http = require("http");
+var request = require('request');
+var options = { json: true };
 var ArrayServer = /** @class */ (function () {
     function ArrayServer() {
         this.maxmin = {};
@@ -51,23 +53,40 @@ var ArrayServer = /** @class */ (function () {
             ArrayServer.SYMBOLS.forEach(function (sym) {
                 ArrayServer[tf.array][sym] = [];
                 console.log(__dirname);
-                var url = "".concat(__dirname, "/realData/").concat(tf.path, "/").concat(sym, ".json");
-                var rawData = require(url);
-                if (rawData) {
-                    rawData.values.forEach(function (element) {
-                        console;
-                        ArrayServer[tf.array][sym].push({
-                            timestamp: element[0],
-                            open: element[2],
-                            high: element[4],
-                            low: element[5],
-                            close: element[3]
+                var url = "https://jacobcthomas.com/docs/realData/".concat(tf.path, "/").concat(sym, ".json");
+                //let rawData = require(url);
+                request(url, options, function (error, res, body) {
+                    if (error) {
+                        return console.log(error);
+                    }
+                    ;
+                    if (!error && res.statusCode == 200) {
+                        body.values.forEach(function (element) {
+                            console;
+                            ArrayServer[tf.array][sym].push({
+                                timestamp: element[0],
+                                open: element[2],
+                                high: element[4],
+                                low: element[5],
+                                close: element[3]
+                            });
                         });
-                    });
-                }
-                else {
-                    console.log('no data');
-                }
+                    }
+                    ;
+                });
+                // if(rawData) {
+                //         rawData.values.forEach(element => {console
+                //         ArrayServer[tf.array][sym].push({
+                //             timestamp: element[0],
+                //             open: element[2],
+                //             high: element[4],
+                //             low: element[5],
+                //             close: element[3]
+                //         })
+                //     });
+                //     } else {
+                //         console.log('no data')
+                //     }
             });
         });
     };

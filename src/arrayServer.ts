@@ -3,6 +3,9 @@ import * as cors from 'cors'
 import * as http from 'http'
 import * as SocketIO from 'socket.io'
 import * as Interfaces from './Interfaces'
+const request = require('request');
+
+let options = {json: true};
 
 export class ArrayServer {
 
@@ -76,23 +79,43 @@ export class ArrayServer {
 
             ArrayServer[tf.array][sym] = []
             console.log(__dirname)
-            let url = `${__dirname}/realData/${tf.path}/${sym}.json`
-            let rawData = require(url);
+            let url = `https://jacobcthomas.com/docs/realData/${tf.path}/${sym}.json`
+            //let rawData = require(url);
             
-            if(rawData) {
-                    rawData.values.forEach(element => {console
-                    ArrayServer[tf.array][sym].push({
-                        timestamp: element[0],
-                        open: element[2],
-                        high: element[4],
-                        low: element[5],
-                        close: element[3]
-                    })
+
+            request(url, options, (error, res, body) => {
+                if (error) {
+                    return  console.log(error)
+                };
+
+                if (!error && res.statusCode == 200) {
+                    body.values.forEach(element => {console
+                        ArrayServer[tf.array][sym].push({
+                            timestamp: element[0],
+                            open: element[2],
+                            high: element[4],
+                            low: element[5],
+                            close: element[3]
+                        })
+                        
+                    });
+                };
+            });
+
+            // if(rawData) {
+            //         rawData.values.forEach(element => {console
+            //         ArrayServer[tf.array][sym].push({
+            //             timestamp: element[0],
+            //             open: element[2],
+            //             high: element[4],
+            //             low: element[5],
+            //             close: element[3]
+            //         })
                     
-                });
-                } else {
-                    console.log('no data')
-                }
+            //     });
+            //     } else {
+            //         console.log('no data')
+            //     }
         })
         })
         
