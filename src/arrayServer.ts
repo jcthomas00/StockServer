@@ -78,11 +78,9 @@ export class ArrayServer {
             ArrayServer.SYMBOLS.forEach((sym) => {
 
             ArrayServer[tf.array][sym] = []
-            console.log(__dirname)
             let url = `https://jacobcthomas.com/docs/realData/${tf.path}/${sym}.json`
             //let rawData = require(url);
-            
-
+        
             request(url, options, (error, res, body) => {
                 if (error) {
                     return  console.log(error)
@@ -151,8 +149,8 @@ export class ArrayServer {
                 })
             }
         });
-        console.log("first: ",output.data[0].data[0])
-        console.log("last: ",output.data[0].data[output.data[0].data.length-1])
+        // console.log("first: ",output.data[0].data[0])
+        // console.log("last: ",output.data[0].data[output.data[0].data.length-1])
         return output;
     }
 
@@ -166,12 +164,12 @@ export class ArrayServer {
             //output['new-value'].data.push([])
         }else{
             
-            const lastVals = ArrayServer[this.tfArr][sym][ArrayServer[this.tfArr][sym].length - 1];
-            //console.log(lastVals, sym)
+            const lastVals = ArrayServer[this.tfArr][sym][0];
+            //console.log(ArrayServer[this.tfArr][sym][0], sym)
             const rand = (1-(Math.random()*2))/50;
             
             //console.log("rand: ",rand)
-            const newClose = lastVals.close + (rand)
+            const newClose = lastVals.close + rand
             
             const newValue = {
                 timestamp: new Date().toISOString(),

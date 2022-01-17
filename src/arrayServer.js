@@ -52,7 +52,6 @@ var ArrayServer = /** @class */ (function () {
             console.log("arr | path: ", tf.array, tf.path);
             ArrayServer.SYMBOLS.forEach(function (sym) {
                 ArrayServer[tf.array][sym] = [];
-                console.log(__dirname);
                 var url = "https://jacobcthomas.com/docs/realData/".concat(tf.path, "/").concat(sym, ".json");
                 //let rawData = require(url);
                 request(url, options, function (error, res, body) {
@@ -120,8 +119,8 @@ var ArrayServer = /** @class */ (function () {
                 });
             }
         });
-        console.log("first: ", output.data[0].data[0]);
-        console.log("last: ", output.data[0].data[output.data[0].data.length - 1]);
+        // console.log("first: ",output.data[0].data[0])
+        // console.log("last: ",output.data[0].data[output.data[0].data.length-1])
         return output;
     };
     ArrayServer.prototype.getLiveData = function (sym) {
@@ -134,11 +133,11 @@ var ArrayServer = /** @class */ (function () {
             //output['new-value'].data.push([])
         }
         else {
-            var lastVals = ArrayServer[this.tfArr][sym][ArrayServer[this.tfArr][sym].length - 1];
-            //console.log(lastVals, sym)
+            var lastVals = ArrayServer[this.tfArr][sym][0];
+            //console.log(ArrayServer[this.tfArr][sym][0], sym)
             var rand = (1 - (Math.random() * 2)) / 50;
             //console.log("rand: ",rand)
-            var newClose = lastVals.close + (rand);
+            var newClose = lastVals.close + rand;
             var newValue = {
                 timestamp: new Date().toISOString(),
                 open: lastVals.close,
