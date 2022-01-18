@@ -133,6 +133,7 @@ var ArrayServer = /** @class */ (function () {
             //output['new-value'].data.push([])
         }
         else {
+            console.log("sym: ", ArrayServer[this.tfArr]);
             var lastVals = ArrayServer[this.tfArr][sym][0];
             //console.log(ArrayServer[this.tfArr][sym][0], sym)
             var rand = (1 - (Math.random() * 2)) / 50;
@@ -183,8 +184,7 @@ var ArrayServer = /** @class */ (function () {
         return this.app;
     };
     ArrayServer.PORT = 8080; // Default local port
-    ArrayServer.SYMBOLS = ['AAPL', 'TSLA', 'NVDA', 'JPM', 'BAC'];
-    //,'TSLA', 'NVDA', 'JPM', 'BAC'
+    ArrayServer.SYMBOLS = ['AAPL', 'TSLA', 'NVDA', 'JPM', 'BAC', 'NBR', 'GOOG', 'AXP', 'COF', 'WFC', 'MSFT', 'FB', 'AMZN', 'GS', 'MS', 'V', 'GME', 'NFLX', 'KO', 'JNJ', 'CRM', 'PYPL', 'XOM', 'HD', 'DIS'];
     ArrayServer.dummyData = {};
     ArrayServer.realData = {}; // -1
     ArrayServer.realData5 = {}; // 5

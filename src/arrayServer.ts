@@ -10,8 +10,7 @@ let options = {json: true};
 export class ArrayServer {
 
     public static readonly PORT: number = 8080 // Default local port
-    public static readonly SYMBOLS: string[] = ['AAPL','TSLA', 'NVDA', 'JPM', 'BAC'];
-    //,'TSLA', 'NVDA', 'JPM', 'BAC'
+    public static readonly SYMBOLS: string[] = ['AAPL', 'TSLA', 'NVDA', 'JPM', 'BAC','NBR', 'GOOG', 'AXP', 'COF', 'WFC', 'MSFT', 'FB', 'AMZN', 'GS', 'MS', 'V', 'GME', 'NFLX', 'KO', 'JNJ', 'CRM', 'PYPL', 'XOM', 'HD', 'DIS'];
     public static dummyData:{[symbol:string]:Interfaces.DataPoint[]} = {}
     public static realData:{[symbol:string]:Interfaces.DataPoint[]} = {} // -1
     public static realData5:{[symbol:string]:Interfaces.DataPoint[]} = {} // 5
@@ -164,6 +163,7 @@ export class ArrayServer {
             //output['new-value'].data.push([])
         }else{
             
+            console.log("sym: ",ArrayServer[this.tfArr])
             const lastVals = ArrayServer[this.tfArr][sym][0];
             //console.log(ArrayServer[this.tfArr][sym][0], sym)
             const rand = (1-(Math.random()*2))/50;
