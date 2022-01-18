@@ -184,7 +184,7 @@ var ArrayServer = /** @class */ (function () {
         return this.app;
     };
     ArrayServer.PORT = 8080; // Default local port
-    ArrayServer.SYMBOLS = ['AAPL', 'TSLA', 'NVDA', 'JPM', 'BAC', 'NBR', 'GOOG', 'AXP', 'COF', 'WFC', 'MSFT', 'FB', 'AMZN', 'GS', 'MS', 'V', 'GME', 'NFLX', 'KO', 'JNJ', 'CRM', 'PYPL', 'XOM', 'HD', 'DIS'];
+    ArrayServer.SYMBOLS = ['AAPL', 'TSLA', 'NVDA', 'JPM', 'BAC', 'NBR', 'GOOG', 'AXP', 'COF', 'WFC', 'MSFT', 'FB', 'AMZN', 'GS', 'MS'];
     ArrayServer.dummyData = {};
     ArrayServer.realData = {}; // -1
     ArrayServer.realData5 = {}; // 5
