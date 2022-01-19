@@ -166,7 +166,7 @@ export class ArrayServer {
             console.log("sym: ",ArrayServer[this.tfArr])
             const lastVals = ArrayServer[this.tfArr][sym][0];
             //console.log(ArrayServer[this.tfArr][sym][0], sym)
-            const rand = (1-(Math.random()*2))/50;
+            const rand = (1-(Math.random()*2));
             
             //console.log("rand: ",rand)
             const newClose = lastVals.close + rand

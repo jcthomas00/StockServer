@@ -136,7 +136,7 @@ var ArrayServer = /** @class */ (function () {
             console.log("sym: ", ArrayServer[this.tfArr]);
             var lastVals = ArrayServer[this.tfArr][sym][0];
             //console.log(ArrayServer[this.tfArr][sym][0], sym)
-            var rand = (1 - (Math.random() * 2)) / 50;
+            var rand = (1 - (Math.random() * 2));
             //console.log("rand: ",rand)
             var newClose = lastVals.close + rand;
             var newValue = {
